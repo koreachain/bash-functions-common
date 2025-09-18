@@ -109,7 +109,7 @@ def sync_and_enable(name, action, options, tmpdir):
 
     if user != "root":
         shell(["mkdir", "-p", dest], user=user)  # create with user permissions
-    shell(["rsync", "-v", f"--chown={user}:{user}", f"{tmpdir}/", f"{dest}/"])
+    shell(["rsync", "-rv", f"--chown={user}:{user}", f"{tmpdir}/", f"{dest}/"])
 
     shell([*systemctl, "daemon-reload"], user=user)
     if action == "program":
@@ -188,7 +188,7 @@ def main():
                     else:
                         raise ValueError(f"Unknown action: {action}")
 
-    shell(["rsync", "-v", f"--chmod=F755", f"{bindir}/", "/usr/local/bin/"])
+    shell(["rsync", "-rv", f"--chmod=F755", f"{bindir}/", "/usr/local/bin/"])
 
     if install:
         exp = re.compile(r"^.i")
