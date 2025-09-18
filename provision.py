@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # ---
 # install:
+#   - python3-common-local
 #   - python3-rich
 #   - python3-yaml
-# pip:
-#   - git+ssh://git@github.com/koreachain/python-pip-common.git
 """
 Usage:
   provision.py [--dry-run] <directory>
