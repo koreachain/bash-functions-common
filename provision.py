@@ -19,6 +19,7 @@ Arguments:
 import atexit
 import configparser
 import os
+import re
 import shutil
 import sys
 
@@ -177,7 +178,15 @@ def main():
                         raise ValueError(f"Unknown action: {action}")
 
     if install:
-        shell(["apt", "install", *sorted(install)])
+        exp = re.compile(r"^.i")
+        not_installed = [
+            pkg for pkg in sorted(install)
+            if not exp.search(
+                cmd.run(["dpkg-query", "-W", "-f=${db:Status-Abbrev}", pkg], check=False).stdout
+            )
+        ]
+        if not_installed:
+            shell(["apt", "install", *not_installed])
 
     if pip:
         shell(["pip3", "install", *sorted(pip)])
