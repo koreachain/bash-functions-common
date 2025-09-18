@@ -109,7 +109,7 @@ def sync_and_enable(name, action, options, tmpdir):
 
     if user != "root":
         shell(["mkdir", "-p", dest], user=user)  # create with user permissions
-    shell(["rsync", "-rv", f"--chown={user}:{user}", f"{tmpdir}/", f"{dest}/"])
+    shell(["rsync", "-v", f"--chown={user}:{user}", f"{tmpdir}/", f"{dest}/"])
 
     shell([*systemctl, "daemon-reload"], user=user)
     if action == "program":
@@ -146,12 +146,15 @@ def main():
     tmpdir = cmd.run(["mktemp", "-d", "./.tmp.XXXXXXXXXX"]).stdout
     atexit.register(cleanup_tmpdir)
 
+    bindir = os.path.join(Args.directory, "bin")
+
     install, pip, disable = set(), set(), set()
     program, startup = [], []
-    for root, dirs, files in os.walk(Args.directory):
+    for root, dirs, files in os.walk(bindir):
         for name in files:
             script = os.path.join(root, name)
-            lines = []
+
+            header = []
             with open(script) as data:
                 begin = True
                 for line in data:
@@ -163,16 +166,14 @@ def main():
                             break
 
                     if line.startswith("#"):
-                        lines.append(line.replace("# ", ""))
+                        header.append(line.replace("# ", ""))
                     else:
                         break
 
-                if not lines or not lines[0].startswith("---"):
+                if not header or not header[0].startswith("---"):
                     continue
 
-                shell(["install", script, "/usr/local/bin/"])
-
-                instructions = yaml.safe_load("".join(lines))
+                instructions = yaml.safe_load("".join(header))
                 for action, data in instructions.items():
                     if action == "install":
                         install.update(data)
@@ -186,6 +187,8 @@ def main():
                         disable.update(data)
                     else:
                         raise ValueError(f"Unknown action: {action}")
+
+    shell(["rsync", "-v", f"--chmod=F755", f"{bindir}/", "/usr/local/bin/"])
 
     if install:
         exp = re.compile(r"^.i")
