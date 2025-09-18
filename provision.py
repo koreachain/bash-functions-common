@@ -120,7 +120,7 @@ def shell(*args, **kwargs):
     else:
         console.log(*args)
 
-    if not args.dry_run:
+    if not Args.dry_run:
         cmd.tty(*args, **kwargs)
 
 
@@ -137,7 +137,7 @@ def main():
 
     install, pip, disable = set(), set(), set()
     program, startup = [], []
-    for root, dirs, files in os.walk(args.directory):
+    for root, dirs, files in os.walk(Args.directory):
         for name in files:
             script = os.path.join(root, name)
             lines = []
@@ -204,6 +204,6 @@ def main():
     shell(["install", sys.argv[0], "/usr/local/bin/"])
 
 if __name__ == "__main__":
-    args = arg.parse(__doc__)
+    Args = arg.parse(__doc__)
 
     main()
