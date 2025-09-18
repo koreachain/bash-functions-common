@@ -106,7 +106,7 @@ def sync_and_enable(name, action, options, tmpdir):
         dest = f"/home/{user}/.config/systemd/user"
         systemctl = ["systemctl", "--user"]
 
-    shell(["rsync", "-rv", "--chmod=600", f"{tmpdir}/", f"{dest}/"], user=user)
+    shell(["rsync", "-rv", f"--chown={user}:{user}", "--chmod=600", f"{tmpdir}/", f"{dest}/"])
     shell([*systemctl, "daemon-reload"], user=user)
     if action == "program":
         shell([*systemctl, "enable", "--now", f"{name}.timer"], user=user)
