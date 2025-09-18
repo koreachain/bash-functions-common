@@ -201,7 +201,8 @@ def main():
     if disable:
         shell(["systemctl", "disable", "--now", *sorted(disable)])
 
-    shell(["install", sys.argv[0], "/usr/local/bin/"])
+    if not os.path.realpath(sys.argv[0]).startswith("/usr/local/bin/"):
+        shell(["install", sys.argv[0], "/usr/local/bin/"])
 
 if __name__ == "__main__":
     Args = arg.parse(__doc__)
