@@ -80,7 +80,7 @@ print(){
             ;;
             push)
                 alias.push.sh warning "$(uname -n): $__exec" \
-                    "$(echo "$_message" | head -c 2000)"
+                    "$(echo "$_message" | head -c 1500)"
             ;;
             email)
                 echo "$_message" | head -c 100000 |
